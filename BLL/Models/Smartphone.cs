@@ -18,12 +18,18 @@ namespace ASD_Lab1.BLL.Models
                 NotifyError($"[{ModelName}] Цей пристрій не підтримує підключення принтера!");
                 return;
             }
-            base.ConnectPeripheral(peripheral); 
+            base.ConnectPeripheral(peripheral);
         }
 
         public void Play()
         {
-            if (TryExecuteAction("MobileGame", false, "", true))
+            if (!Screen.IsMultiTouchSupported)
+            {
+                NotifyError($"[{ModelName}] Без підтримки Multi-Touch грати неможливо!");
+                return;
+            }
+
+            if (TryExecuteAction("Game", false, "", true))
                 Notify($"[{ModelName}] Запущено мобільну гру. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
 
@@ -35,21 +41,13 @@ namespace ASD_Lab1.BLL.Models
 
         public void ListenMusic()
         {
-            if (!IsPoweredOn) { NotifyError($"[{ModelName}] Пристрій вимкнено!"); return; }
-
-            if (!ConnectedPeripherals.Contains("Headphones"))
-            {
-                NotifyError($"[{ModelName}] Не заважай іншим, підключи навушники!");
-                return;
-            }
-
-            if (TryExecuteAction("AudioPlayer", false, "", false))
+            if (TryExecuteAction("AudioPlayer", true, "Headphones", false))
                 Notify($"[{ModelName}] Музика в навушниках. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
 
         public void WatchVideo()
         {
-            if (TryExecuteAction("VideoPlayer", false, "", true))
+            if (TryExecuteAction("VideoPlayer", true, "", false))
                 Notify($"[{ModelName}] Перегляд відео. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
     }

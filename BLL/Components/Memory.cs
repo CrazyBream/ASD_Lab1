@@ -24,9 +24,14 @@ namespace ASD_Lab1.BLL.Components
             if (UsedGB + gb <= CapacityGB)
             {
                 UsedGB += gb;
-                return true; 
+                return true;
             }
-            return false; 
+            return false;
+        }
+        public void Free(int gb)
+        {
+            UsedGB -= gb;
+            if (UsedGB < 0) UsedGB = 0; 
         }
     }
 }

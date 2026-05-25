@@ -1,11 +1,6 @@
 ﻿using ASD_Lab1.BLL.Components;
-using ASD_Lab1.BLL.Models;
 using ASD_Lab1.BLL.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ASD_Lab1.BLL.Models
 {
@@ -33,13 +28,13 @@ namespace ASD_Lab1.BLL.Models
 
         public void ListenMusic()
         {
-            if (TryExecuteAction("AudioPlayer", false, "Headphones", false))
+            if (TryExecuteAction("AudioPlayer", true, "Headphones", false))
                 Notify($"[{ModelName}] Грає музика. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
 
         public void WatchVideo()
         {
-            if (TryExecuteAction("VideoPlayer", false, "", true))
+            if (TryExecuteAction("VideoPlayer", true, "", false))
                 Notify($"[{ModelName}] Відтворення відео. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
 

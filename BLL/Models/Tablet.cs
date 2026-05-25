@@ -29,8 +29,14 @@ namespace ASD_Lab1.BLL.Models
 
         public void Play()
         {
-            if (TryExecuteAction("TabletGame", false, "", true))
-                Notify($"[{ModelName}] Граємо на планшеті. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
+            if (!Screen.IsMultiTouchSupported)
+            {
+                NotifyError($"[{ModelName}] Без підтримки Multi-Touch грати неможливо!");
+                return;
+            }
+
+            if (TryExecuteAction("Game", false, "", true))
+                Notify($"[{ModelName}] Граємо на планшеті ({Screen.SizeInches} дюймів). Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
 
         public void Chat()
@@ -41,21 +47,13 @@ namespace ASD_Lab1.BLL.Models
 
         public void ListenMusic()
         {
-            if (!IsPoweredOn) { NotifyError($"[{ModelName}] Пристрій вимкнено!"); return; }
-
-            if (!ConnectedPeripherals.Contains("Headphones"))
-            {
-                NotifyError($"[{ModelName}] Не заважай іншим, підключи навушники!");
-                return;
-            }
-
-            if (TryExecuteAction("AudioPlayer", false, "", false))
+            if (TryExecuteAction("AudioPlayer", true, "Headphones", false))
                 Notify($"[{ModelName}] Музика в навушниках. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
 
         public void WatchVideo()
         {
-            if (TryExecuteAction("VideoPlayer", false, "", true))
+            if (TryExecuteAction("VideoPlayer", true, "", false))
                 Notify($"[{ModelName}] Дивимось фільм. Заряд: {DeviceBattery.CurrentLevel:F1} мАг.");
         }
     }

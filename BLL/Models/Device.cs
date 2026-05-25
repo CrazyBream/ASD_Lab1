@@ -12,7 +12,7 @@ namespace ASD_Lab1.BLL.Models
         public string ModelName { get; protected set; }
         public bool HasPowerOutlet { get; protected set; }
         public bool IsNetworkConnected { get; protected set; }
-        public bool IsPoweredOn { get; protected set; } 
+        public bool IsPoweredOn { get; protected set; }
 
         public Battery DeviceBattery { get; protected set; }
         public Processor Cpu { get; protected set; }
@@ -81,6 +81,28 @@ namespace ASD_Lab1.BLL.Models
             else
             {
                 NotifyError($"[{ModelName}] Недостатньо місця на диску для {software}!");
+            }
+        }
+
+        public virtual void UninstallSoftware(string software, int freedSpaceGB = 10)
+        {
+            if (!IsPoweredOn) { NotifyError("Спочатку увімкніть пристрій!"); return; }
+
+            if (InstalledSoftware.Contains(software))
+            {
+                InstalledSoftware.Remove(software);
+
+                var rom = MemoryModules.FirstOrDefault(m => m.Type == "ROM");
+                if (rom != null)
+                {
+                    rom.Free(freedSpaceGB);
+                }
+
+                Notify($"[{ModelName}] ПЗ {software} успішно видалено. Звільнено {freedSpaceGB}ГБ.");
+            }
+            else
+            {
+                NotifyError($"[{ModelName}] ПЗ {software} не знайдено на пристрої.");
             }
         }
 

@@ -32,8 +32,21 @@ namespace ASD_Lab1.BLL.Services
         {
             var newId = Guid.NewGuid();
             var battery = new Battery(batteryCapacity);
-            var cpu = new Processor("Intel/ARM", 8);
-            var screen = new TouchScreen(6.5, true);
+
+            TouchScreen screen = deviceType switch
+            {
+                "Tablet" => new TouchScreen(11.0, true),
+                "Smartphone" => new TouchScreen(6.1, true),
+                _ => new TouchScreen(0, false) 
+            };
+
+            Processor cpu = deviceType switch
+            {
+                "Laptop" => new Processor("Intel Core i7", 8),
+                "Tablet" => new Processor("Apple M1", 4),
+                "Smartphone" => new Processor("ARM Cortex", 2),
+                _ => new Processor("Generic", 4)
+            };
 
             Device device = deviceType switch
             {
@@ -53,8 +66,21 @@ namespace ASD_Lab1.BLL.Services
             if (entity == null) return null;
 
             var battery = new Battery(entity.BatteryCapacity, entity.CurrentBatteryLevel);
-            var cpu = new Processor("Intel/ARM", 8);
-            var screen = new TouchScreen(6.5, true);
+
+            TouchScreen screen = entity.DeviceType switch
+            {
+                "Tablet" => new TouchScreen(11.0, true),
+                "Smartphone" => new TouchScreen(6.1, true),
+                _ => new TouchScreen(0, false)
+            };
+
+            Processor cpu = entity.DeviceType switch
+            {
+                "Laptop" => new Processor("Intel Core i7", 8),
+                "Tablet" => new Processor("Apple M1", 4),
+                "Smartphone" => new Processor("ARM Cortex", 2),
+                _ => new Processor("Generic", 4)
+            };
 
             Device device = entity.DeviceType switch
             {
@@ -88,6 +114,7 @@ namespace ASD_Lab1.BLL.Services
                 "Office" => 15,
                 "Game" => 50,
                 "VideoPlayer" => 2,
+                "AudioPlayer" => 2,
                 "PrinterDriver" => 1,
                 "Messenger" => 3,
                 _ => 10

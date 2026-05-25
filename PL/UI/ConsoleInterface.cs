@@ -79,7 +79,11 @@ namespace ASD_Lab1.PL.UI
                 var rom = device.MemoryModules.FirstOrDefault(m => m.Type == "ROM");
                 string romInfo = rom != null ? $"{rom.UsedGB}/{rom.CapacityGB} ГБ" : "0/0 ГБ";
 
-                Console.WriteLine($"\n--- ЕКРАН: {device.ModelName} | Стан: {status} | Заряд: {device.DeviceBattery.CurrentLevel:F0} мАг | Диск ROM: {romInfo} ---");
+                string screenInfo = "";
+                if (device is Smartphone phone) screenInfo = $" | Екран: {phone.Screen.SizeInches}\" MT:{(phone.Screen.IsMultiTouchSupported ? "+" : "-")}";
+                else if (device is Tablet tab) screenInfo = $" | Екран: {tab.Screen.SizeInches}\" MT:{(tab.Screen.IsMultiTouchSupported ? "+" : "-")}";
+
+                Console.WriteLine($"\n--- ЕКРАН: {device.ModelName} | Стан: {status} | Заряд: {device.DeviceBattery.CurrentLevel:F0} мАг | Диск: {romInfo} | ЦП: {device.Cpu.Model} ({device.Cpu.Cores} ядра){screenInfo} ---");
 
                 Console.WriteLine("--- БАЗОВЕ КЕРУВАННЯ ---");
                 Console.WriteLine("1. Увімкнути / Вимкнути пристрій");
@@ -92,9 +96,10 @@ namespace ASD_Lab1.PL.UI
                 Console.WriteLine("6. Запустити Office (Робота)");
                 Console.WriteLine("7. Запустити Гра (Інтенсивне)");
                 Console.WriteLine("8. Запустити YouTube (Відео)");
-                Console.WriteLine("9. Слухати музику (Аудіоплеєр)"); 
+                Console.WriteLine("9. Слухати музику (Аудіоплеєр)");
                 Console.WriteLine("10. Роздрукувати файл");
                 Console.WriteLine("11. Відкрити Месенджер");
+                Console.WriteLine("12. Видалити ПЗ");
                 Console.WriteLine("0. Покласти пристрій на стіл (Назад до вибору)");
 
                 Console.Write("Оберіть дію: ");
@@ -112,9 +117,10 @@ namespace ASD_Lab1.PL.UI
                     case "6": if (device is IWorkable w) w.Work(); else Console.WriteLine("Цей пристрій не підтримує роботу."); break;
                     case "7": if (device is IPlayable p) p.Play(); else Console.WriteLine("Цей пристрій не підтримує ігри."); break;
                     case "8": if (device is IMediaPlayer m1) m1.WatchVideo(); else Console.WriteLine("Цей пристрій не підтримує відео."); break;
-                    case "9": if (device is IMediaPlayer m2) m2.ListenMusic(); else Console.WriteLine("Цей пристрій не підтримує музику."); break; 
+                    case "9": if (device is IMediaPlayer m2) m2.ListenMusic(); else Console.WriteLine("Цей пристрій не підтримує музику."); break;
                     case "10": if (device is IPrintable pr) pr.Print(); else Console.WriteLine("Цей пристрій не підтримує друк."); break;
                     case "11": if (device is ICommunicable c) c.Chat(); else Console.WriteLine("Цей пристрій не підтримує чати."); break;
+                    case "12": UninstallSoftwareMenu(device); break;
 
                     case "0":
                         _deviceService.SaveDeviceState(device);
@@ -128,6 +134,22 @@ namespace ASD_Lab1.PL.UI
 
         private void InstallSoftwareMenu(Device device)
         {
+            if (!device.IsPoweredOn)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("[ПОМИЛКА] Спочатку увімкніть пристрій!");
+                Console.ResetColor();
+                return;
+            }
+
+            if (!device.IsNetworkConnected)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("[ПОМИЛКА] Для доступу до App Store підключіться до Wi-Fi!");
+                Console.ResetColor();
+                return;
+            }
+
             Console.WriteLine("Оберіть ПЗ для встановлення:");
             Console.WriteLine("1. Office (15 ГБ)\n2. Game (50 ГБ)\n3. VideoPlayer (2 ГБ)\n4. PrinterDriver (1 ГБ)\n5. Messenger (3 ГБ)\n6. AudioPlayer (2 ГБ)");
             string? swChoice = Console.ReadLine();
@@ -140,6 +162,32 @@ namespace ASD_Lab1.PL.UI
                 case "4": device.InstallSoftware("PrinterDriver", 1); break;
                 case "5": device.InstallSoftware("Messenger", 3); break;
                 case "6": device.InstallSoftware("AudioPlayer", 2); break;
+                default: Console.WriteLine("Скасовано."); break;
+            }
+        }
+
+        private void UninstallSoftwareMenu(Device device)
+        {
+            if (!device.IsPoweredOn)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("[ПОМИЛКА] Спочатку увімкніть пристрій!");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine("Оберіть ПЗ для видалення:");
+            Console.WriteLine("1. Office (15 ГБ)\n2. Game (50 ГБ)\n3. VideoPlayer (2 ГБ)\n4. PrinterDriver (1 ГБ)\n5. Messenger (3 ГБ)\n6. AudioPlayer (2 ГБ)");
+            string? swChoice = Console.ReadLine();
+
+            switch (swChoice)
+            {
+                case "1": device.UninstallSoftware("Office", 15); break;
+                case "2": device.UninstallSoftware("Game", 50); break;
+                case "3": device.UninstallSoftware("VideoPlayer", 2); break;
+                case "4": device.UninstallSoftware("PrinterDriver", 1); break;
+                case "5": device.UninstallSoftware("Messenger", 3); break;
+                case "6": device.UninstallSoftware("AudioPlayer", 2); break;
                 default: Console.WriteLine("Скасовано."); break;
             }
         }
