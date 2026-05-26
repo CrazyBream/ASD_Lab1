@@ -15,5 +15,6 @@ namespace ASD_Lab1.BLL.Interfaces
         void InstallSoftware(string software, int requiredSpaceGB = 10);
 
         void ConnectPeripheral(string peripheral);
+        void DisconnectPeripheral(string peripheral);
     }
 }

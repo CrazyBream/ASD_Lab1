@@ -101,6 +101,7 @@ namespace ASD_Lab1.PL.UI
                 Console.WriteLine("10. Роздрукувати файл");
                 Console.WriteLine("11. Відкрити Месенджер");
                 Console.WriteLine("12. Видалити ПЗ");
+                Console.WriteLine("13. Відключити периферію");
                 Console.WriteLine("0. Покласти пристрій на стіл (Назад до вибору)");
 
                 Console.Write("Оберіть дію: ");
@@ -122,6 +123,7 @@ namespace ASD_Lab1.PL.UI
                     case "10": if (device is IPrintable pr) pr.Print(); else Console.WriteLine("Цей пристрій не підтримує друк."); break;
                     case "11": if (device is ICommunicable c) c.Chat(); else Console.WriteLine("Цей пристрій не підтримує чати."); break;
                     case "12": UninstallSoftwareMenu(device); break;
+                    case "13": DisconnectPeripheralMenu(device); break;
 
                     case "0":
                         _deviceService.SaveDeviceState(device);
@@ -201,6 +203,15 @@ namespace ASD_Lab1.PL.UI
 
             if (perChoice == "1") device.ConnectPeripheral("Printer");
             else if (perChoice == "2") device.ConnectPeripheral("Headphones");
+        }
+        private void DisconnectPeripheralMenu(Device device)
+        {
+            Console.WriteLine("Оберіть пристрій для відключення:");
+            Console.WriteLine("1. Printer\n2. Headphones");
+            string? perChoice = Console.ReadLine();
+
+            if (perChoice == "1") device.DisconnectPeripheral("Printer");
+            else if (perChoice == "2") device.DisconnectPeripheral("Headphones");
         }
 
         private void SubscribeToEvents(Device device)

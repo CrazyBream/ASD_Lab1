@@ -68,6 +68,19 @@ namespace ASD_Lab1.BLL.Models
             }
         }
 
+        public virtual void DisconnectPeripheral(string peripheral)
+        {
+            if (ConnectedPeripherals.Contains(peripheral))
+            {
+                ConnectedPeripherals.Remove(peripheral);
+                Notify($"[{ModelName}] Відключено: {peripheral}.");
+            }
+            else
+            {
+                NotifyError($"[{ModelName}] {peripheral} не було підключено.");
+            }
+        }
+
         public void InstallSoftware(string software, int requiredSpaceGB = 10)
         {
             if (!IsPoweredOn) { NotifyError("Спочатку увімкніть пристрій!"); return; }
