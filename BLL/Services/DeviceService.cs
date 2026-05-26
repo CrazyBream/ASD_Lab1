@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using ASD_Lab1.DAL.Repositories;
 using ASD_Lab1.DAL.Entities;
 using ASD_Lab1.BLL.Models;
-using ASD_Lab1.BLL.Components;
+using ASD_Lab1.BLL.Factories;
 
 namespace ASD_Lab1.BLL.Services
 {
@@ -31,30 +31,8 @@ namespace ASD_Lab1.BLL.Services
         public Device CreateDevice(string deviceType, string modelName, int batteryCapacity)
         {
             var newId = Guid.NewGuid();
-            var battery = new Battery(batteryCapacity);
 
-            TouchScreen screen = deviceType switch
-            {
-                "Tablet" => new TouchScreen(11.0, true),
-                "Smartphone" => new TouchScreen(6.1, true),
-                _ => new TouchScreen(0, false) 
-            };
-
-            Processor cpu = deviceType switch
-            {
-                "Laptop" => new Processor("Intel Core i7", 8),
-                "Tablet" => new Processor("Apple M1", 4),
-                "Smartphone" => new Processor("ARM Cortex", 2),
-                _ => new Processor("Generic", 4)
-            };
-
-            Device device = deviceType switch
-            {
-                "Laptop" => new Laptop(newId, modelName, battery, cpu),
-                "Smartphone" => new Smartphone(newId, modelName, battery, cpu, screen),
-                "Tablet" => new Tablet(newId, modelName, battery, cpu, screen),
-                _ => throw new ArgumentException("Невідомий тип пристрою!")
-            };
+            Device device = DeviceFactory.CreateNewDevice(deviceType, modelName, batteryCapacity, newId);
 
             SaveDeviceState(device);
             return device;
@@ -65,30 +43,12 @@ namespace ASD_Lab1.BLL.Services
             var entity = _repository.GetDeviceById(id);
             if (entity == null) return null;
 
-            var battery = new Battery(entity.BatteryCapacity, entity.CurrentBatteryLevel);
-
-            TouchScreen screen = entity.DeviceType switch
-            {
-                "Tablet" => new TouchScreen(11.0, true),
-                "Smartphone" => new TouchScreen(6.1, true),
-                _ => new TouchScreen(0, false)
-            };
-
-            Processor cpu = entity.DeviceType switch
-            {
-                "Laptop" => new Processor("Intel Core i7", 8),
-                "Tablet" => new Processor("Apple M1", 4),
-                "Smartphone" => new Processor("ARM Cortex", 2),
-                _ => new Processor("Generic", 4)
-            };
-
-            Device device = entity.DeviceType switch
-            {
-                "Laptop" => new Laptop(entity.Id, entity.ModelName, battery, cpu),
-                "Smartphone" => new Smartphone(entity.Id, entity.ModelName, battery, cpu, screen),
-                "Tablet" => new Tablet(entity.Id, entity.ModelName, battery, cpu, screen),
-                _ => throw new Exception("Помилка типу пристрою в базі даних")
-            };
+            Device device = DeviceFactory.RestoreDevice(
+                entity.DeviceType,
+                entity.ModelName,
+                entity.BatteryCapacity,
+                entity.CurrentBatteryLevel,
+                entity.Id);
 
             if (entity.HasNetworkConnection) device.ConnectNetwork();
 
