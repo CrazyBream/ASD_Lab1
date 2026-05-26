@@ -1,5 +1,6 @@
 ﻿using ASD_Lab1.BLL.Components;
 using ASD_Lab1.BLL.Interfaces;
+using ASD_Lab1.BLL.Events; 
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,8 +21,8 @@ namespace ASD_Lab1.BLL.Models
         public List<string> InstalledSoftware { get; protected set; } = new();
         public List<string> ConnectedPeripherals { get; protected set; } = new();
 
-        public event Action<string>? OnStateChanged;
-        public event Action<string>? OnError;
+        public event EventHandler<DeviceStateChangedEventArgs>? StateChanged;
+        public event EventHandler<DeviceErrorEventArgs>? ErrorOccurred;
 
         protected Device(Guid id, string modelName, Battery battery, Processor cpu)
         {
@@ -106,8 +107,8 @@ namespace ASD_Lab1.BLL.Models
             }
         }
 
-        protected void Notify(string message) => OnStateChanged?.Invoke(message);
-        protected void NotifyError(string message) => OnError?.Invoke(message);
+        protected void Notify(string message) => StateChanged?.Invoke(this, new DeviceStateChangedEventArgs(message));
+        protected void NotifyError(string message) => ErrorOccurred?.Invoke(this, new DeviceErrorEventArgs(message));
 
         protected bool TryExecuteAction(string requiredSoftware, bool requiresNetwork, string requiredPeripheral, bool isIntensive)
         {

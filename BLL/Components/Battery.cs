@@ -10,7 +10,7 @@ namespace ASD_Lab1.BLL.Components
         private readonly double _intensiveDrainRate;
         private readonly double _nonIntensiveDrainRate;
 
-        public event Action? OnBatteryDepleted;
+        public event EventHandler<EventArgs>? BatteryDepleted;
 
         public Battery(int capacity)
         {
@@ -50,7 +50,7 @@ namespace ASD_Lab1.BLL.Components
             }
 
             CurrentLevel = 0;
-            OnBatteryDepleted?.Invoke();
+            BatteryDepleted?.Invoke(this, EventArgs.Empty);
             return false;
         }
 

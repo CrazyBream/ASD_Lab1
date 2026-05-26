@@ -1,4 +1,5 @@
-﻿using ASD_Lab1.BLL.Interfaces;
+﻿using ASD_Lab1.BLL.Events;
+using ASD_Lab1.BLL.Interfaces;
 using ASD_Lab1.BLL.Models;
 using ASD_Lab1.BLL.Services;
 using System;
@@ -204,30 +205,31 @@ namespace ASD_Lab1.PL.UI
 
         private void SubscribeToEvents(Device device)
         {
-            device.OnStateChanged -= OnStateChangedHandler;
-            device.OnError -= OnErrorHandler;
-            device.DeviceBattery.OnBatteryDepleted -= OnBatteryDepletedHandler;
+            device.StateChanged -= OnStateChangedHandler;
+            device.ErrorOccurred -= OnErrorHandler;
+            device.DeviceBattery.BatteryDepleted -= OnBatteryDepletedHandler;
 
-            device.OnStateChanged += OnStateChangedHandler;
-            device.OnError += OnErrorHandler;
-            device.DeviceBattery.OnBatteryDepleted += OnBatteryDepletedHandler;
+            device.StateChanged += OnStateChangedHandler;
+            device.ErrorOccurred += OnErrorHandler;
+            device.DeviceBattery.BatteryDepleted += OnBatteryDepletedHandler;
         }
 
-        private void OnStateChangedHandler(string message)
+
+        private void OnStateChangedHandler(object? sender, DeviceStateChangedEventArgs e)
         {
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"> {message}");
+            Console.WriteLine($"> {e.Message}"); 
             Console.ResetColor();
         }
 
-        private void OnErrorHandler(string error)
+        private void OnErrorHandler(object? sender, DeviceErrorEventArgs e)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine($"[ПОМИЛКА] {error}");
+            Console.WriteLine($"[ПОМИЛКА] {e.ErrorMessage}");
             Console.ResetColor();
         }
 
-        private void OnBatteryDepletedHandler()
+        private void OnBatteryDepletedHandler(object? sender, EventArgs e)
         {
             Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("\n[УВАГА] Акумулятор розряджений! Роботу завершено.");
